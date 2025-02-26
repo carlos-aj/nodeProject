@@ -5,8 +5,9 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase"; 
 import styles from "../CSS/Chats.module.css";
 
-const socket = io("http://localhost:3000");
-
+const socket = io(
+    process.env.NODE_ENV === "production" ? "https://nodeprojectqueapp.onrender.com" : "http://localhost:3000"
+  );
 const Chats = () => {
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
