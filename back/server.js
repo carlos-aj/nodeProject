@@ -2,12 +2,13 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const path = require('path');  
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: process.env.PORT || 4000, 
+        origin: process.env.CLIENT_URL || "http://localhost:3000",  
         methods: ["GET", "POST"]
     }
 });
@@ -15,11 +16,17 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
+app.use(express.static(path.join(__dirname, 'dist')));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));  
+});
+
 let users = [];
 
 io.on('connection', (socket) => {
     console.log('Nuevo usuario conectado:', socket.id);
-    
+
     socket.on('join', (data) => {
         users.push({ id: socket.id, user: data.user, avatar: data.avatar });
         io.emit('users', users);
@@ -37,7 +44,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('message', (data) => {
-        io.emit('message', data); 
+        io.emit('message', data);
     });
 
     socket.on('typing', (data) => {
@@ -49,10 +56,14 @@ io.on('connection', (socket) => {
     });
 
     socket.on('update-user', (data) => {
-        users = users.filter(user => user.id !== socket.id); 
-        users.push({ id: socket.id, user: data.user, avatar: data.avatar }); 
+        users = users.filter(user => user.id !== socket.id);
+        users.push({ id: socket.id, user: data.user, avatar: data.avatar });
         io.emit('users', users);
     });
 });
 
-server.listen(3000, () => console.log('Servidor corriendo en http://localhost:3000'));
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
