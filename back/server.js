@@ -2,13 +2,13 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
-const path = require('path');  
+const path = require('path');  // Para trabajar con rutas de archivos
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: process.env.CLIENT_URL || "http://localhost:3000",  
+        origin: process.env.CLIENT_URL || "http://localhost:3000",  // URL de tu frontend
         methods: ["GET", "POST"]
     }
 });
@@ -16,10 +16,12 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
+// Sirve los archivos estáticos desde la carpeta "dist"
 app.use(express.static(path.join(__dirname, 'dist')));
 
+// Esta ruta responde cuando alguien accede a la raíz "/"
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));  
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));  // Sirve el archivo index.html desde dist
 });
 
 let users = [];
