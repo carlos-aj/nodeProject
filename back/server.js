@@ -17,11 +17,11 @@ app.use(cors());
 app.use(express.json());
 
 // Sirve los archivos estáticos desde la carpeta "dist"
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // Esta ruta responde cuando alguien accede a la raíz "/"
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));  // Sirve el archivo index.html desde dist
+    res.sendFile(path.join(__dirname, '../dist', 'index.html'));  // Sirve el archivo index.html desde dist
 });
 
 let users = [];
