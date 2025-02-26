@@ -15,6 +15,7 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
+
 app.get('/', (req, res) => {
     res.send('¡El servidor está funcionando correctamente!');
 });
