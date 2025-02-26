@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: process.env.PORT || 4000, 
+        origin: process.env.CLIENT_URL || "http://localhost:3000", 
         methods: ["GET", "POST"]
     }
 });
@@ -55,4 +55,8 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(3000, () => console.log('Servidor corriendo en http://localhost:3000'));
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
