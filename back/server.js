@@ -2,12 +2,13 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const path = require('path');  // Para trabajar con rutas de archivos
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: process.env.CLIENT_URL || "http://localhost:3000",  
+        origin: process.env.CLIENT_URL || "http://localhost:3000",  // URL de tu frontend
         methods: ["GET", "POST"]
     }
 });
@@ -15,16 +16,19 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
+// Sirve los archivos estáticos desde la carpeta "dist"
+app.use(express.static(path.join(__dirname, 'dist')));
 
+// Esta ruta responde cuando alguien accede a la raíz "/"
 app.get('/', (req, res) => {
-    res.send('¡El servidor está funcionando correctamente!');
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));  // Sirve el archivo index.html desde dist
 });
 
 let users = [];
 
 io.on('connection', (socket) => {
     console.log('Nuevo usuario conectado:', socket.id);
-    
+
     socket.on('join', (data) => {
         users.push({ id: socket.id, user: data.user, avatar: data.avatar });
         io.emit('users', users);
@@ -42,7 +46,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('message', (data) => {
-        io.emit('message', data); 
+        io.emit('message', data);
     });
 
     socket.on('typing', (data) => {
@@ -54,8 +58,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('update-user', (data) => {
-        users = users.filter(user => user.id !== socket.id); 
-        users.push({ id: socket.id, user: data.user, avatar: data.avatar }); 
+        users = users.filter(user => user.id !== socket.id);
+        users.push({ id: socket.id, user: data.user, avatar: data.avatar });
         io.emit('users', users);
     });
 });
